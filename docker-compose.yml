@@ -1,0 +1,26 @@
+version: '3'
+services:
+  minio:
+    build: ./minio
+    container_name: minio
+    ports:
+      - "9090:9090"
+      - "9000:9000"
+    volumes:
+      - ./data:/data
+    environment:
+      MINIO_ACCESS_KEY: minio
+      MINIO_SECRET_KEY: password
+    command: server /data
+  keycloak:
+    build: ./keycloak
+    container_name: keycloak
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+      DB_VENDOR: h2
+      PROXY_ADDRESS_FORWARDING: "true"
+      KEYCLOAK_LOGLEVEL: DEBUG
