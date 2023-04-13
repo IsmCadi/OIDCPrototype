@@ -1,0 +1,17 @@
+{
+  "realm": "cyberduckrealm",
+  "clients": [{
+    "clientId": "minio",
+    "enabled": true,
+    "protocol": "openid-connect",
+    "redirectUris": ["http://minio:9000/oidc/callback"],
+    "publicClient": false,
+    "secret": "password",
+    "attributes": {
+      "s3IdentityProviderEnabled": "true",
+      "s3IdentityProviderAccessKey": "minio",
+      "s3IdentityProviderSecretKey": "password",
+      "s3IdentityProviderEndpoint": "http://minio:9000"
+    }
+  }]
+}
