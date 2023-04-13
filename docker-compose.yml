@@ -17,8 +17,11 @@ services:
     volumes:
       - ./keycloak/keycloak-realm.json:/tmp/keycloak-realm.json
     command: -Dkeycloak.profile.feature.upload_scripts=enabled
+
   minio:
     build: ./minio
+    depends_on:
+      - keycloak
     container_name: minio
     ports:
       - "9000:9000"
@@ -26,13 +29,23 @@ services:
     volumes:
       - ./data:/data
     environment:
-      MINIO_ACCESS_KEY: minio
-      MINIO_SECRET_KEY: password
+      MINIO_ROOT_USER: cyberduckAccessKey
+      MINIO_ROOT_PASSWORD: cyberduckSecretKey
       KEYCLOAK_IMPORT: /tmp/minio-realm.json
-      MINIO_IDENTITY_OPENID_CONFIG_URL: http://192.168.1.65:8080/auth/realms/cyberduckrealm/.well-known/openid-configuration
+      MINIO_IDENTITY_OPENID_CONFIG_URL: http://host.docker.internal:8080/auth/realms/cyberduckrealm/.well-known/openid-configuration
       MINIO_IDENTITY_OPENID_CLIENT_ID: minio
       MINIO_IDENTITY_OPENID_CLIENT_SECRET: password
     command: server /data --console-address :9001
+
+  createbuckets:
+    image: minio/mc
     depends_on:
-      - keycloak
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc alias set myminio http://minio:9000 minio password;
+      /usr/bin/mc mb myminio/cyberduckbucket;
+      /usr/bin/mc policy set public myminio/cyberduckbucket;
+      exit 0;
+      "
 

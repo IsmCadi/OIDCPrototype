@@ -9,8 +9,8 @@
     "secret": "password",
     "attributes": {
       "s3IdentityProviderEnabled": "true",
-      "s3IdentityProviderAccessKey": "minio",
-      "s3IdentityProviderSecretKey": "password",
+      "s3IdentityProviderAccessKey": "cyberduckAccessKey",
+      "s3IdentityProviderSecretKey": "cyberduckSecretKey",
       "s3IdentityProviderEndpoint": "http://minio:9000"
     }
   }]
