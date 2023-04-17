@@ -14,6 +14,10 @@ services:
       DB_VENDOR: h2
       PROXY_ADDRESS_FORWARDING: "true"
       KEYCLOAK_LOGLEVEL: DEBUG
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://host.docker.internal:8080/auth/ || exit 1"]
+      interval: 10s
+      retries: 5
     volumes:
       - ./keycloak/keycloak-realm.json:/tmp/keycloak-realm.json
     command: -Dkeycloak.profile.feature.upload_scripts=enabled
@@ -21,8 +25,10 @@ services:
   minio:
     build: ./minio
     depends_on:
-      - keycloak
+      keycloak:
+        condition: service_healthy
     container_name: minio
+    restart: on-failure
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -35,6 +41,10 @@ services:
       MINIO_IDENTITY_OPENID_CONFIG_URL: http://host.docker.internal:8080/auth/realms/cyberduckrealm/.well-known/openid-configuration
       MINIO_IDENTITY_OPENID_CLIENT_ID: minio
       MINIO_IDENTITY_OPENID_CLIENT_SECRET: password
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --fail http://host.docker.internal:9000/minio/ || exit 1" ]
+      interval: 10s
+      retries: 5
     command: server /data --console-address :9001
 
   createbuckets:
@@ -43,7 +53,7 @@ services:
       - minio
     entrypoint: >
       /bin/sh -c "
-      /usr/bin/mc alias set myminio http://minio:9000 minio password;
+      /usr/bin/mc alias set myminio http://minio:9000 cyberduckAccessKey cyberduckSecretKey;
       /usr/bin/mc mb myminio/cyberduckbucket;
       /usr/bin/mc policy set public myminio/cyberduckbucket;
       exit 0;
