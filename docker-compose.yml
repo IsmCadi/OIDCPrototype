@@ -41,6 +41,10 @@ services:
       MINIO_IDENTITY_OPENID_CONFIG_URL: http://host.docker.internal:8080/auth/realms/cyberduckrealm/.well-known/openid-configuration
       MINIO_IDENTITY_OPENID_CLIENT_ID: minio
       MINIO_IDENTITY_OPENID_CLIENT_SECRET: password
+      MINIO_IDENTITY_OPENID_DISPLAY_NAME: SSO_Keycloak
+      MINIO_IDENTITY_OPENID_SCOPES: openid,email,minio-authorization
+      MINIO_IDENTITY_OPENID_REDIRECT_URI_DYNAMIC: "true"
+
     healthcheck:
       test: [ "CMD-SHELL", "curl --fail http://host.docker.internal:9000/minio/ || exit 1" ]
       interval: 10s
