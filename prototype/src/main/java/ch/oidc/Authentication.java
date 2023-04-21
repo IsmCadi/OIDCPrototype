@@ -12,10 +12,10 @@ import java.io.IOException;
 import java.util.Collections;
 
 public class Authentication {
-    private final String clientID = "test";
-    private final String clientSecret = "6ca08336-3a50-46b5-aaa0-f73e5c76210a";
-    //private final String redirectURI = "http://minio:9000/oidc/callback";
-    private final String redirectURI = "http://localhost:8080/callback";
+    private final String clientID = "minio";
+    private final String clientSecret = "password";
+    private final String redirectURI = "http://minio:9000/oidc/callback";
+    //private final String redirectURI = "http://localhost:8080/callback";
     private final String authorizationEndpoint = "http://localhost:8080/auth/realms/cyberduckrealm/protocol/openid-connect/auth";
     private final String tokenEndpoint = "http://localhost:8080/auth/realms/cyberduckrealm/protocol/openid-connect/token";
     private static final String scope = "openid profile";
@@ -42,7 +42,7 @@ public class Authentication {
     // Validate the access token after exchange
     public void validateAccessToken(String accessToken) throws IOException {
         HttpRequestFactory requestFactory = new NetHttpTransport().createRequestFactory();
-        GenericUrl url = new GenericUrl("http://localhost:8080/auth/cyberduckrealm/master/protocol/openid-connect/userinfo");
+        GenericUrl url = new GenericUrl("http://localhost:8080/auth/realms/master/protocol/openid-connect/userinfo");
         HttpRequest request = requestFactory.buildGetRequest(url);
         request.getHeaders().setAuthorization("Bearer " + accessToken);
         HttpResponse response = request.execute();
