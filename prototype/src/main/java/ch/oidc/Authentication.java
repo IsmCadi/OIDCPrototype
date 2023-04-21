@@ -25,7 +25,7 @@ public class Authentication {
     public String getAuthorizationUrl() {
         AuthorizationCodeRequestUrl authorizationUrl = new AuthorizationCodeRequestUrl(authorizationEndpoint, clientID)
                 .setRedirectUri(redirectURI)
-                .setScopes(Collections.singletonList("openid"));
+                .setScopes(Collections.singletonList("profile"));
         return authorizationUrl.build();
     }
 
