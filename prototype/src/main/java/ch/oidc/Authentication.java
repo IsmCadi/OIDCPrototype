@@ -10,11 +10,13 @@ import com.google.api.client.json.gson.GsonFactory;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.logging.Logger;
 
 public class Authentication {
+
     private final String clientID = "minio";
     private final String clientSecret = "password";
-    private final String redirectURI = "http://minio:9000/oidc/callback";
+    private final String redirectURI = "http://localhost:9000/oidc/callback";
     //private final String redirectURI = "http://localhost:8080/callback";
     private final String authorizationEndpoint = "http://localhost:8080/auth/realms/cyberduckrealm/protocol/openid-connect/auth";
     private final String tokenEndpoint = "http://localhost:8080/auth/realms/cyberduckrealm/protocol/openid-connect/token";

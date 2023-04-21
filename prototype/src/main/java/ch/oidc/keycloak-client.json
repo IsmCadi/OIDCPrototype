@@ -1,0 +1,9 @@
+{
+  "clientId": "my-client",
+  "clientSecret": "my-secret",
+  "authUri": "https://keycloak.example.com/auth/realms/my-realm/protocol/openid-connect/auth",
+  "tokenUri": "https://keycloak.example.com/auth/realms/my-realm/protocol/openid-connect/token",
+  "scope": "openid profile email",
+  "redirectUri": "http://localhost:8080",
+  "clientAuthMethod": "client_secret_post"
+}
