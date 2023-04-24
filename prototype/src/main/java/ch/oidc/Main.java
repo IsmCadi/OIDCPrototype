@@ -1,11 +1,18 @@
 package ch.oidc;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.Scanner;
 import java.io.IOException;
 
 public class Main {
+
+    //private static final Logger LOGGER = LogManager.getLogger(Main.class);
     public static void main(String[] args) throws IOException {
 
+        System.setProperty("log4j.configurationFile", "log4j2.xml");
+        //LOGGER.debug("Starting token validation");
         // Create an instance of the Authentication class
         Authentication auth = new Authentication();
 
