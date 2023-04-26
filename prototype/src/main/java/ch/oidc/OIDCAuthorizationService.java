@@ -15,13 +15,12 @@ import java.io.IOException;
 import java.util.Collections;
 
 public class OIDCAuthorizationService {
-
     private static final String clientID = "minio";
     private static final String clientSecret = "password";
-    private static final String redirectURI = "http://192.168.1.65:9000/oidc/callback";
+    private static final String redirectURI = "http://localhost:9000/oidc/callback";
     private static final String scopes = "openid profile minio-authorization";
-    private static final String tokenEndpoint = "http://192.168.1.65:8080/auth/realms/cyberduckrealm/protocol/openid-connect/token";
-    private static final String authorizationEndpoint = "http://192.168.1.65:8080/auth/realms/cyberduckrealm/protocol/openid-connect/auth";
+    private static final String tokenEndpoint = "http://localhost:8080/auth/realms/cyberduckrealm/protocol/openid-connect/token";
+    private static final String authorizationEndpoint = "http://localhost:8080/auth/realms/cyberduckrealm/protocol/openid-connect/auth";
 
     // Sets up the HTTP transport and JSON factory
     private final HttpTransport httpTransport = new NetHttpTransport();
@@ -74,7 +73,7 @@ public class OIDCAuthorizationService {
 
     public static void validateAccessToken(String accessToken) throws IOException {
         HttpRequestFactory requestFactory = new NetHttpTransport().createRequestFactory();
-        GenericUrl url = new GenericUrl("http://192.168.1.65:9001/auth/realms/master/protocol/openid-connect/userinfo");
+        GenericUrl url = new GenericUrl("http://localhost:9001/auth/realms/master/protocol/openid-connect/userinfo");
         HttpRequest request = requestFactory.buildGetRequest(url);
         request.getHeaders().setAuthorization("Bearer " + accessToken);
         HttpResponse response = request.execute();
