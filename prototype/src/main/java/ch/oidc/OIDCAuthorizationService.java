@@ -10,6 +10,7 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import java.net.HttpURLConnection;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -45,16 +46,6 @@ public class OIDCAuthorizationService {
                 .setRedirectUri(redirectURI);
         return authorizationUrl.build();
     }
-
-    // Exchanges the authorization code for an access token
-/*    public String exchangeAuthorizationCodeForAccessToken(String authorizationCode) throws IOException {
-        TokenResponse response = new AuthorizationCodeTokenRequest(new NetHttpTransport(), new GsonFactory(),
-                new GenericUrl(tokenEndpoint), authorizationCode)
-                .setRedirectUri(redirectURI)
-                .setClientAuthentication(new BasicAuthentication(clientID, clientSecret))
-                .execute();
-        return response.getAccessToken();
-    }*/
 
     // Exchanges the authorization code for the access and id token
     public static String exchangeAuthorizationCodeForAccessToken(String authorizationCode) throws IOException {
