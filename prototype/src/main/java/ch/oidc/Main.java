@@ -27,11 +27,17 @@ public class Main {
 
         oidcConfig.validateAccessToken(accessToken);
 
-        // Try to upload a file into the cyberduck bucket
         try {
-            OIDCMinioUploader.uploadFile();
+            OIDCAuthorizationService.uploadFile(accessToken);
         } catch (IOException | MinioException | InvalidKeyException | NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
+
+        // Try to upload a file into the cyberduck bucket
+/*        try {
+            OIDCMinioUploader.uploadFile();
+        } catch (IOException | MinioException | InvalidKeyException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }*/
     }
 }
