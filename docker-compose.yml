@@ -15,7 +15,7 @@ services:
       PROXY_ADDRESS_FORWARDING: "true"
       KEYCLOAK_LOGLEVEL: DEBUG
     healthcheck:
-      test: ["CMD-SHELL", "curl --fail http://host.docker.internal:8080/auth/ || exit 1"]
+      test: ["CMD-SHELL", "curl --fail http://localhost:8080/auth/ || exit 1"]
       interval: 10s
       retries: 5
     volumes:
@@ -38,7 +38,7 @@ services:
       MINIO_ROOT_USER: cyberduckAccessKey
       MINIO_ROOT_PASSWORD: cyberduckSecretKey
       KEYCLOAK_IMPORT: /tmp/minio-realm.json
-      MINIO_IDENTITY_OPENID_CONFIG_URL: http://host.docker.internal:8080/auth/realms/cyberduckrealm/.well-known/openid-configuration
+      MINIO_IDENTITY_OPENID_CONFIG_URL: http://localhost:8080/auth/realms/cyberduckrealm/.well-known/openid-configuration
       MINIO_IDENTITY_OPENID_CLIENT_ID: minio
       MINIO_IDENTITY_OPENID_CLIENT_SECRET: password
       MINIO_IDENTITY_OPENID_DISPLAY_NAME: SSO_Keycloak
@@ -46,7 +46,7 @@ services:
       MINIO_IDENTITY_OPENID_REDIRECT_URI_DYNAMIC: "true"
 
     healthcheck:
-      test: [ "CMD-SHELL", "curl --fail http://host.docker.internal:9000/minio/ || exit 1" ]
+      test: [ "CMD-SHELL", "curl --fail http://localhost:9000/minio/ || exit 1" ]
       interval: 10s
       retries: 5
     command: server /data --console-address :9001
