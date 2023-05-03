@@ -1,9 +1,9 @@
 package ch.oidc;
 
 import io.minio.MinioClient;
-import io.minio.errors.MinioException;
 import io.minio.UploadObjectArgs;
-import java.io.File;
+import io.minio.errors.MinioException;
+
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -11,21 +11,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class OIDCMinioUploader {
-    private static final String MINIO_SERVER_URL = "http://localhost:9000";
-    private static final String ACCESS_TOKEN = "";
+    private static final String minioServerUrl = "localhost";
 
-    public static void uploadFile() throws IOException, InvalidKeyException, MinioException, NoSuchAlgorithmException {
+    public static void uploadFile(String sessionToken, String accessKey, String secretKey) throws IOException, InvalidKeyException, MinioException, NoSuchAlgorithmException {
         // Create a new MinioClient object
         MinioClient minioClient = MinioClient.builder()
-                .endpoint(MINIO_SERVER_URL)
+                .endpoint(minioServerUrl, 9000, false)
+                .credentials(accessKey, secretKey)
                 .build();
 
         // Set the access token as a header for authentication
         Map<String, String> headers = new HashMap<>();
-        headers.put("Authorization", "Bearer " + ACCESS_TOKEN);
+        headers.put("Authorization", "Bearer " + sessionToken);
         //minioClient.setRequestHeaders(headers);
-        var req = "";
 
+        System.out.println(minioClient.listBuckets());
 
         // Upload the file to the MinIO bucket
         minioClient.uploadObject(

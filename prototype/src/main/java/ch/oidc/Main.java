@@ -20,16 +20,30 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter the authorization code: ");
         String authorizationCode = scanner.nextLine();
-        String accessToken = oidcConfig.exchangeAuthorizationCodeForAccessToken(authorizationCode);
+        String accessToken = OIDCAuthorizationService.exchangeAuthorizationCodeForAccessToken(authorizationCode);
 
         System.out.println(accessToken);
         System.out.println("Thats the userinfo:");
 
-        oidcConfig.validateAccessToken(accessToken);
+        OIDCAuthorizationService.validateAccessToken(accessToken);
+
+        System.out.println("Enter the id token: ");
+        String idToken = scanner.nextLine();
+        OIDCAuthorizationService.minioSts(idToken);
+
+
+        System.out.println("Enter the session token from STS: ");
+        String sessionToken = scanner.nextLine();
+
+        System.out.println("Enter the access key from STS: ");
+        String accessKey = scanner.nextLine();
+
+        System.out.println("Enter the secret key from STS: ");
+        String secretKey = scanner.nextLine();
 
         // Try to upload a file into the cyberduck bucket
         try {
-            OIDCMinioUploader.uploadFile();
+            OIDCMinioUploader.uploadFile(accessToken, accessKey, secretKey);
         } catch (IOException | MinioException | InvalidKeyException | NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
