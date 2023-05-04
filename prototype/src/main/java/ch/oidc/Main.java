@@ -1,15 +1,17 @@
 package ch.oidc;
 
+import com.google.api.client.auth.oauth2.TokenResponse;
 import io.minio.errors.MinioException;
-
+import org.xml.sax.SAXException;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
-
+    public static void main(String[] args) throws IOException, ParserConfigurationException, SAXException {
 
         OIDCAuthorizationService oidcConfig = new OIDCAuthorizationService();
         String authorizationUrl = oidcConfig.getAuthorizationUrl();
@@ -20,30 +22,31 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter the authorization code: ");
         String authorizationCode = scanner.nextLine();
-        String accessToken = OIDCAuthorizationService.exchangeAuthorizationCodeForAccessToken(authorizationCode);
+        TokenResponse tokenResponse = OIDCAuthorizationService.exchangeAuthorizationCodeForTokens(authorizationCode);
+        String accessToken = OIDCAuthorizationService.getAccessToken(tokenResponse);
+        //System.out.println("Thats the userinfo:");
+        //OIDCAuthorizationService.validateAccessToken(accessToken);
 
-        System.out.println(accessToken);
-        System.out.println("Thats the userinfo:");
+        String idToken = OIDCAuthorizationService.getIdToken(tokenResponse);
+        String stsResponse = OIDCAuthorizationService.minioSts(idToken);
+        OIDCAuthorizationService.extractKeysAndToken(stsResponse);
 
-        OIDCAuthorizationService.validateAccessToken(accessToken);
+        Map<String, String> keysAndToken = OIDCAuthorizationService.extractKeysAndToken(stsResponse);
+        String accessKey = keysAndToken.get("AccessKey");
+        String secretKey = keysAndToken.get("SecretKey");
+        String sessionToken = keysAndToken.get("SessionToken");
 
-        System.out.println("Enter the id token: ");
-        String idToken = scanner.nextLine();
-        OIDCAuthorizationService.minioSts(idToken);
-
-
-        System.out.println("Enter the session token from STS: ");
-        String sessionToken = scanner.nextLine();
-
-        System.out.println("Enter the access key from STS: ");
-        String accessKey = scanner.nextLine();
-
-        System.out.println("Enter the secret key from STS: ");
-        String secretKey = scanner.nextLine();
+        System.out.println("----------Access and secret key start----------");
+        System.out.println("AccessKey: " + accessKey);
+        System.out.println("SecretKey: " + secretKey);
+        System.out.println("-----------Access and secret key end-----------");
+        System.out.println("---------------Sessiontoken start--------------");
+        System.out.println(sessionToken);
+        System.out.println("----------------Sessiontoken end---------------");
 
         // Try to upload a file into the cyberduck bucket
         try {
-            OIDCMinioUploader.uploadFile(accessToken, accessKey, secretKey);
+            OIDCMinioUploader.uploadFile(sessionToken, accessKey, secretKey);
         } catch (IOException | MinioException | InvalidKeyException | NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
