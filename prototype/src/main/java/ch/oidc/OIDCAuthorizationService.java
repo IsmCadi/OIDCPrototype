@@ -8,8 +8,15 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.http.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
-
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.w3c.dom.Element;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,6 +24,7 @@ import java.util.Map;
 public class OIDCAuthorizationService {
     private static final String clientID = "minio";
     private static final String clientSecret = "password";
+    private static final String minioServerUrl = "http://localhost:9000";
     private static final String redirectURI = "http://localhost:9000/oidc/callback";
     private static final String scopes = "openid profile minio-authorization";
     private static final String tokenEndpoint = "http://localhost:8080/auth/realms/cyberduckrealm/protocol/openid-connect/token";
@@ -28,7 +36,6 @@ public class OIDCAuthorizationService {
 
     // Builds flow and trigger user authorization request
     public String getAuthorizationUrl() {
-
         // Sets up the authorization code flow
         AuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                 httpTransport,
@@ -47,32 +54,44 @@ public class OIDCAuthorizationService {
     }
 
     // Exchanges the authorization code for the access and id token
-    public static String exchangeAuthorizationCodeForAccessToken(String authorizationCode) throws IOException {
+    public static TokenResponse exchangeAuthorizationCodeForTokens(String authorizationCode) throws IOException {
         TokenResponse response = new AuthorizationCodeTokenRequest(new NetHttpTransport(), jsonFactory,
                 new GenericUrl(tokenEndpoint), authorizationCode)
                 .setRedirectUri(redirectURI)
                 .setClientAuthentication(new BasicAuthentication(clientID, clientSecret))
                 .execute();
-        // Gets the access and id token from the response
+        return response;
+    }
+
+    // Call the above method to get the tokens and then extract the access token and id token separately
+    public static String getAccessToken(TokenResponse response) {
         String accessToken = response.getAccessToken();
-        String idToken = response.get("id_token").toString();
-        System.out.println("ID token: " + idToken);
+        System.out.println("-----------------------------");
+        System.out.println("Access Token: " + accessToken);
         return accessToken;
     }
 
-    public static void validateAccessToken(String accessToken) throws IOException {
+    public static String getIdToken(TokenResponse response) {
+        String idToken = response.get("id_token").toString();
+        System.out.println("-----------------------------");
+        System.out.println("ID token: " + idToken);
+        System.out.println("-----------------------------");
+        return idToken;
+    }
+
+/*    public static void validateAccessToken(String accessToken) throws IOException {
         HttpRequestFactory requestFactory = new NetHttpTransport().createRequestFactory();
-        GenericUrl url = new GenericUrl("http://localhost:9001/auth/realms/master/protocol/openid-connect/userinfo");
+        GenericUrl url = new GenericUrl("http://localhost:9000/auth/realms/master/protocol/openid-connect/userinfo");
         HttpRequest request = requestFactory.buildGetRequest(url);
         request.getHeaders().setAuthorization("Bearer " + accessToken);
         HttpResponse response = request.execute();
         String userInfo = response.parseAsString();
         System.out.println(userInfo);
-    }
+    }*/
 
-    public static void minioSts(String idToken) throws IOException {
+    public static String minioSts(String idToken) throws IOException {
         HttpRequestFactory requestFactory = new NetHttpTransport().createRequestFactory();
-        GenericUrl url = new GenericUrl("http://localhost:9000/");
+        GenericUrl url = new GenericUrl(minioServerUrl);
 
         Map<String, String> data = new HashMap<>();
         data.put("Action", "AssumeRoleWithWebIdentity");
@@ -81,16 +100,38 @@ public class OIDCAuthorizationService {
         data.put("DurationSeconds", "86000");
 
         HttpContent content = new UrlEncodedContent(data);
-
         HttpHeaders headers = new HttpHeaders();
-//        headers.setContentType("application/x-www-form-urlencoded");
         headers.setAccept("*/*");
 
         HttpRequest request = requestFactory.buildPostRequest(url, content);
         request.setHeaders(headers);
         HttpResponse response = request.execute();
 
-        System.out.println("STS Response" + response.parseAsString());
+        return response.parseAsString();
+    }
+
+    // Extract keys and sessionToken for the MinIO connection in the upload
+    public static Map<String, String> extractKeysAndToken(String stsResponse) throws ParserConfigurationException, SAXException, IOException {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        InputSource inputSource = new InputSource(new StringReader(stsResponse));
+        Document document = builder.parse(inputSource);
+
+        Element accessKeyElement = (Element) document.getElementsByTagName("AccessKeyId").item(0);
+        String accessKey = accessKeyElement.getTextContent();
+
+        Element secretKeyElement = (Element) document.getElementsByTagName("SecretAccessKey").item(0);
+        String secretKey = secretKeyElement.getTextContent();
+
+        Element sessionTokenElement = (Element) document.getElementsByTagName("SessionToken").item(0);
+        String sessionToken = sessionTokenElement.getTextContent();
+
+        Map<String, String> keysAndToken = new HashMap<>();
+        keysAndToken.put("AccessKey", accessKey);
+        keysAndToken.put("SecretKey", secretKey);
+        keysAndToken.put("SessionToken", sessionToken);
+
+        return keysAndToken;
     }
 
 }
