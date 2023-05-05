@@ -54,29 +54,16 @@ public class OIDCAuthorizationService {
     }
 
     // Exchanges the authorization code for the access and id token
-    public static TokenResponse exchangeAuthorizationCodeForTokens(String authorizationCode) throws IOException {
+    public static OAuthTokens exchangeAuthorizationCodeForTokens(String authorizationCode) throws IOException {
         TokenResponse response = new AuthorizationCodeTokenRequest(new NetHttpTransport(), jsonFactory,
                 new GenericUrl(tokenEndpoint), authorizationCode)
                 .setRedirectUri(redirectURI)
                 .setClientAuthentication(new BasicAuthentication(clientID, clientSecret))
                 .execute();
-        return response;
-    }
 
-    // Call the above method to get the tokens and then extract the access token and id token separately
-    public static String getAccessToken(TokenResponse response) {
-        String accessToken = response.getAccessToken();
-        System.out.println("-----------------------------");
-        System.out.println("Access Token: " + accessToken);
-        return accessToken;
-    }
-
-    public static String getIdToken(TokenResponse response) {
-        String idToken = response.get("id_token").toString();
-        System.out.println("-----------------------------");
-        System.out.println("ID token: " + idToken);
-        System.out.println("-----------------------------");
-        return idToken;
+        // extract tokens and save them in an OAuthTokens object.
+        final long expiryInMilliseconds = System.currentTimeMillis() + response.getExpiresInSeconds() * 1000;
+        return new OAuthTokens(response.getAccessToken(), response.getRefreshToken(), expiryInMilliseconds);
     }
 
 /*    public static void validateAccessToken(String accessToken) throws IOException {
@@ -89,15 +76,15 @@ public class OIDCAuthorizationService {
         System.out.println(userInfo);
     }*/
 
-    public static String minioSts(String idToken) throws IOException {
+    public static String minioSts(String accessToken) throws IOException {
         HttpRequestFactory requestFactory = new NetHttpTransport().createRequestFactory();
         GenericUrl url = new GenericUrl(minioServerUrl);
 
         Map<String, String> data = new HashMap<>();
         data.put("Action", "AssumeRoleWithWebIdentity");
-        data.put("WebIdentityToken", idToken);
+        data.put("WebIdentityToken", accessToken);
         data.put("Version", "2011-06-15");
-        data.put("DurationSeconds", "86000");
+//        data.put("DurationSeconds", "86000");
 
         HttpContent content = new UrlEncodedContent(data);
         HttpHeaders headers = new HttpHeaders();

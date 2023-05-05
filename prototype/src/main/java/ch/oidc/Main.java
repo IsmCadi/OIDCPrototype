@@ -22,14 +22,11 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter the authorization code: ");
         String authorizationCode = scanner.nextLine();
-        TokenResponse tokenResponse = OIDCAuthorizationService.exchangeAuthorizationCodeForTokens(authorizationCode);
-        String accessToken = OIDCAuthorizationService.getAccessToken(tokenResponse);
+        OAuthTokens creds = OIDCAuthorizationService.exchangeAuthorizationCodeForTokens(authorizationCode);
         //System.out.println("Thats the userinfo:");
         //OIDCAuthorizationService.validateAccessToken(accessToken);
 
-        String idToken = OIDCAuthorizationService.getIdToken(tokenResponse);
-        String stsResponse = OIDCAuthorizationService.minioSts(idToken);
-        OIDCAuthorizationService.extractKeysAndToken(stsResponse);
+        String stsResponse = OIDCAuthorizationService.minioSts(creds.getAccessToken());
 
         Map<String, String> keysAndToken = OIDCAuthorizationService.extractKeysAndToken(stsResponse);
         String accessKey = keysAndToken.get("AccessKey");
@@ -44,11 +41,19 @@ public class Main {
         System.out.println(sessionToken);
         System.out.println("----------------Sessiontoken end---------------");
 
-        // Try to upload a file into the cyberduck bucket
-        try {
-            OIDCMinioUploader.uploadFile(sessionToken, accessKey, secretKey);
-        } catch (IOException | MinioException | InvalidKeyException | NoSuchAlgorithmException e) {
-            e.printStackTrace();
+        // Try to upload files into the cyberduck bucket
+
+        System.out.println("Type some chars to upload a file. No chars -> exit loop");
+        while (scanner.hasNext()) {
+            String input = scanner.nextLine();
+            try {
+                OIDCMinioUploader.uploadFile(sessionToken, accessKey, secretKey);
+            } catch (InvalidKeyException | MinioException e) {
+                System.out.println("Try Refresh Token");
+            } catch (IOException | NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            }
         }
+
     }
 }
