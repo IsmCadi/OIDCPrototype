@@ -13,7 +13,7 @@ import java.util.Map;
 public class OIDCMinioUploader {
     private static final String minioServerUrl = "http://localhost:9000";
 
-    public static void uploadFile(String sessionToken, String accessKey, String secretKey) throws IOException, InvalidKeyException, MinioException, NoSuchAlgorithmException {
+    public static void uploadFile(String accessKey, String secretKey, String sessionToken) throws IOException, InvalidKeyException, MinioException, NoSuchAlgorithmException {
         //AWSStaticCredentialsProvider credentialsProvider = new AWSStaticCredentialsProvider(accessKey, secretKey, sessionToken);
         StaticProvider staticProvider = new StaticProvider(accessKey, secretKey, sessionToken);
 

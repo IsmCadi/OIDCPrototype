@@ -1,9 +1,6 @@
 package ch.oidc;
 
-import com.google.api.client.auth.oauth2.AuthorizationCodeFlow;
-import com.google.api.client.auth.oauth2.AuthorizationCodeRequestUrl;
-import com.google.api.client.auth.oauth2.AuthorizationCodeTokenRequest;
-import com.google.api.client.auth.oauth2.TokenResponse;
+import com.google.api.client.auth.oauth2.*;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.http.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -75,6 +72,20 @@ public class OIDCAuthorizationService {
         String userInfo = response.parseAsString();
         System.out.println(userInfo);
     }*/
+
+    public static OAuthTokens refresh(String refreshToken) throws IOException {
+        TokenResponse response = new RefreshTokenRequest(new NetHttpTransport(), jsonFactory,
+                new GenericUrl(tokenEndpoint), refreshToken)
+                .setClientAuthentication(new ClientParametersAuthentication(clientID, clientSecret))
+                .setScopes(Collections.singleton(scopes))
+//                .setGrantType("refresh_token")
+//                .setRefreshToken(refreshToken)
+                .execute();
+
+        // extract tokens and save them in an OAuthTokens object.
+        final long expiryInMilliseconds = System.currentTimeMillis() + response.getExpiresInSeconds() * 1000;
+        return new OAuthTokens(response.getAccessToken(), response.getRefreshToken(), expiryInMilliseconds);
+    }
 
     public static String minioSts(String accessToken) throws IOException {
         HttpRequestFactory requestFactory = new NetHttpTransport().createRequestFactory();
