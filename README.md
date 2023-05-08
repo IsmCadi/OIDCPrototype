@@ -20,6 +20,11 @@ Install and start Docker Desktop  : https://docs.docker.com/desktop/
 ### MiniO
 The installation and configuration of keycloak will be performed automatically with the start of *docker-compose.yml*
 
+You can check the functionality by the following curl requests (according to the MinIO manual):
+- curl -d "client_id=minio" -d "client_secret=password" -d "grant_type=password" -d "username=sherom" -d "password=password" http://localhost:8080/auth/realms/cyberduckrealm/protocol/openid-connect/token
+- curl -X POST "http://localhost:8080/auth/realms/cyberduckrealm/protocol/openid-connect/token" -H "Content-Type: application/x-www-form-urlencoded" -d "username=sherom" -d "password=password" -d "grant_type=password" -d "client_id=minio" -d "client_secret=password"
+- curl -X POST "http://localhost:9000" -H "Content-Type: application/x-www-form-urlencoded" -d "Action=AssumeRoleWithWebIdentity" -d "Version=2011-06-15" -d "DurationSeconds=86000" -d "WebIdentityToken=TOKEN"
+
 ### Keycloak
 The installation and configuration of keycloak will be performed automatically with the start of *docker-compose.yml*
 
