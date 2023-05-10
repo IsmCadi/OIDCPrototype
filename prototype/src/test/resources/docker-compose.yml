@@ -4,8 +4,8 @@ services:
   keycloak:
     build: ./keycloak
 #    container_name: keycloak
-#    ports:
-#      - "8080:8080"
+    ports:
+      - "8080:8080"
 #      - "8443:8443"
     environment:
       KEYCLOAK_USER: admin
@@ -29,8 +29,8 @@ services:
 #        condition: service_healthy
 #    container_name: minio
     restart: on-failure
-#    ports:
-#      - "9000:9000"
+    ports:
+      - "9000:9000"
 #      - "9001:9001"
     volumes:
       - ./data:/data

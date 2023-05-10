@@ -5,28 +5,44 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.DockerComposeContainer;
-import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.utility.TestcontainersConfiguration;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TestingEnv {
+public class TestingEnvTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(TestingEnvTest.class);
+//    private static final Slf4jLogConsumer logConsumer = new Slf4jLogConsumer(logger);
 
     @ClassRule
     public static DockerComposeContainer<?> compose = new DockerComposeContainer<>(
             new File("src/test/resources/docker-compose.yml"))
-            .withExposedService("keycloak", 8080, Wait.forHttp("/auth"))
-            .withExposedService("minio", 9000, Wait.forHttp("/minio/health/life"));
+            .withPull(false)
+            .withLocalCompose(true)
+            .withLogConsumer("keycloak_1", new Slf4jLogConsumer(logger))
+            .withLogConsumer("minio_1", new Slf4jLogConsumer(logger))
+            .withExposedService("keycloak_1", 8080, Wait.forListeningPort())
+            .withExposedService("minio_1", 9000, Wait.forListeningPort()); //forHttp("/minio/health/life")
+
+
 
     @Test
     public void testConnectivityToContainers() throws IOException {
+        compose.start();
         HttpRequestFactory requestFactory = new NetHttpTransport().createRequestFactory();
-        GenericUrl url = new GenericUrl("http://localhost:9000");
+
+        String minioUrl = compose.getServiceHost("minio_1", 9000)
+                + ":" +
+                compose.getServicePort("minio_1", 9000);
+        System.out.println(minioUrl);
+        GenericUrl url = new GenericUrl("http://" + minioUrl);
 
         Map<String, String> data = new HashMap<>();
         data.put("Action", "AssumeRoleWithWebIdentity");
@@ -44,6 +60,7 @@ public class TestingEnv {
 
         System.out.println(response.parseAsString());
 
-        Assert.assertNotNull(response);
+        Assert.assertEquals(response.getStatusCode(), 400);
+        compose.stop();
     }
 }
