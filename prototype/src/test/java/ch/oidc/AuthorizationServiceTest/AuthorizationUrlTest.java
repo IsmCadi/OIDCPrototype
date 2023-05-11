@@ -49,6 +49,16 @@ public class AuthorizationUrlTest {
     }
 
     @Test
+    public void testGetAuthorizationUrlHasCorrectAccessTypeAndApprovalPrompt() {
+        OIDCAuthorizationService authorizationService = new OIDCAuthorizationService();
+        String authorizationUrl = authorizationService.getAuthorizationUrl();
+
+        assertTrue(authorizationUrl.contains("access_type=offline"));
+        assertTrue(authorizationUrl.contains("approval_prompt=force"));
+    }
+
+
+    @Test
     public void testGetAuthorizationUrlIncludesAuthorizationServerEndpoint() {
         OIDCAuthorizationService authorizationService = new OIDCAuthorizationService();
         String authorizationUrl = authorizationService.getAuthorizationUrl();
