@@ -1,24 +1,14 @@
 package ch.oidc;
 
-import com.google.api.client.http.*;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import org.junit.Assert;
-import org.junit.Before;
+import ch.oidc.AuthorizationServiceTest.AuthorizationUrlTest;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.DockerComposeContainer;
-import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
-
 import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class TestingEnvTest {
 
@@ -38,14 +28,17 @@ public class TestingEnvTest {
 
 
     @Test
-    public void testGetAuthorizationUrlNotNullOrEmpty() {
-        OIDCAuthorizationService authorizationService = new OIDCAuthorizationService();
-        String authorizationUrl = authorizationService.getAuthorizationUrl();
-
-        assertNotNull(authorizationUrl);
-        assertNotEquals("", authorizationUrl);
+    public void testAuthorizationUrl() {
+        // created an instance of AuthorizationUrlTest
+        AuthorizationUrlTest authUrlTest = new AuthorizationUrlTest();
+        // call the prepared tests
+        authUrlTest.testGetAuthorizationUrlNotNullOrEmpty();
+        authUrlTest.testGetAuthorizationUrlHasCorrectFormat();
+        authUrlTest.testGetAuthorizationUrlIncludesAuthorizationParameters();
+        authUrlTest.testGetAuthorizationUrlIncludesAuthorizationParameters();
+        authUrlTest.testGetAuthorizationUrlHasCorrectAccessTypeAndApprovalPrompt();
+        authUrlTest.testGetAuthorizationUrlIncludesAuthorizationServerEndpoint();
     }
-
 
 
 }
