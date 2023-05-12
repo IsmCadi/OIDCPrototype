@@ -29,6 +29,7 @@ public class TestingEnvTest {
 
     @Test
     public void testAuthorizationUrl() {
+        compose.start();
         // created an instance of AuthorizationUrlTest
         AuthorizationUrlTest authUrlTest = new AuthorizationUrlTest();
         // call the prepared tests
@@ -38,6 +39,7 @@ public class TestingEnvTest {
         authUrlTest.testGetAuthorizationUrlIncludesAuthorizationParameters();
         authUrlTest.testGetAuthorizationUrlHasCorrectAccessTypeAndApprovalPrompt();
         authUrlTest.testGetAuthorizationUrlIncludesAuthorizationServerEndpoint();
+        compose.stop();
     }
 
 
