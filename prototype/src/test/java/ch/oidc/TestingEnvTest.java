@@ -3,6 +3,7 @@ package ch.oidc;
 import com.google.api.client.http.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -16,6 +17,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class TestingEnvTest {
 
     private static final Logger logger = LoggerFactory.getLogger(TestingEnvTest.class);
@@ -26,41 +30,22 @@ public class TestingEnvTest {
             new File("src/test/resources/docker-compose.yml"))
             .withPull(false)
             .withLocalCompose(true)
-            .withLogConsumer("keycloak_1", new Slf4jLogConsumer(logger))
-            .withLogConsumer("minio_1", new Slf4jLogConsumer(logger))
+            .withOptions("--compatibility")
+            //.withLogConsumer("keycloak_1", new Slf4jLogConsumer(logger))
+            //.withLogConsumer("minio_1", new Slf4jLogConsumer(logger))
             .withExposedService("keycloak_1", 8080, Wait.forListeningPort())
             .withExposedService("minio_1", 9000, Wait.forListeningPort()); //forHttp("/minio/health/life")
 
 
-
     @Test
-    public void testConnectivityToContainers() throws IOException {
-        compose.start();
-        HttpRequestFactory requestFactory = new NetHttpTransport().createRequestFactory();
+    public void testGetAuthorizationUrlNotNullOrEmpty() {
+        OIDCAuthorizationService authorizationService = new OIDCAuthorizationService();
+        String authorizationUrl = authorizationService.getAuthorizationUrl();
 
-        String minioUrl = compose.getServiceHost("minio_1", 9000)
-                + ":" +
-                compose.getServicePort("minio_1", 9000);
-        System.out.println(minioUrl);
-        GenericUrl url = new GenericUrl("http://" + minioUrl);
-
-        Map<String, String> data = new HashMap<>();
-        data.put("Action", "AssumeRoleWithWebIdentity");
-        data.put("WebIdentityToken", "invalidXXXX");
-        data.put("Version", "2011-06-15");
-//        data.put("DurationSeconds", "86000");
-
-        HttpContent content = new UrlEncodedContent(data);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept("*/*");
-
-        HttpRequest request = requestFactory.buildPostRequest(url, content);
-        request.setHeaders(headers);
-        HttpResponse response = request.execute();
-
-        System.out.println(response.parseAsString());
-
-        Assert.assertEquals(response.getStatusCode(), 400);
-        compose.stop();
+        assertNotNull(authorizationUrl);
+        assertNotEquals("", authorizationUrl);
     }
+
+
+
 }
