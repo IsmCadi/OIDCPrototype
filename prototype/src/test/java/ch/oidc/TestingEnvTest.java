@@ -56,11 +56,17 @@ public class TestingEnvTest {
 
         HttpRequest request = requestFactory.buildPostRequest(url, content);
         request.setHeaders(headers);
-        HttpResponse response = request.execute();
+        HttpResponse response = null;
+        try {
+             response = request.execute();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            System.out.println(response.parseAsString());
 
-        System.out.println(response.parseAsString());
+            Assert.assertEquals(response.getStatusCode(), 400);
+            compose.stop();
+        }
 
-        Assert.assertEquals(response.getStatusCode(), 400);
-        compose.stop();
     }
 }
