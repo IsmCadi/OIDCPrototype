@@ -2206,5 +2206,31 @@
   },
   "clientPolicies": {
     "policies": []
-  }
+  },
+  "users": [
+    {
+      "username": "testi",
+      "enabled": true,
+      "email": "testi@test.com",
+      "attributes":
+      {
+        "policy":"readwrite"
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "test"
+        }
+      ],
+      "realmRoles": [
+        "user"
+      ],
+      "clientRoles": {
+        "account": [
+          "view-profile",
+          "manage-account"
+        ]
+      }
+    }
+  ]
 }
