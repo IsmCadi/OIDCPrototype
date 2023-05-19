@@ -1,7 +1,6 @@
 #!/bin/sh
 
-# Replace <keycloak_host> and <keycloak_port> with the appropriate values
-KEYCLOAK_URL="http://<keycloak_host>:<keycloak_port>/health/ready"
+KEYCLOAK_URL="http://localhost:8080/health/ready"
 
 # Delay before starting the healthcheck
 DELAY=5
@@ -12,7 +11,7 @@ sleep $DELAY
 MAX_RETRIES=30
 RETRY_DELAY=5
 
-# Perform the healthcheck
+# Performs the healthcheck
 for i in $(seq 1 $MAX_RETRIES); do
   response=$(curl -s -o /dev/null -w "%{http_code}" "$KEYCLOAK_URL")
 

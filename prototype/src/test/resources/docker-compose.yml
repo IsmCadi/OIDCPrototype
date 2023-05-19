@@ -17,19 +17,25 @@ services:
       KC_HEALTH_ENABLED: true
       KC_METRICS_ENABLED: true
     healthcheck:
-      test: "curl -f http://localhost:8080//health/ready || exit 1"
+      test: ["CMD-SHELL", "curl --fail http://localhost:8080/health || exit 1"]
       interval: 10s
       retries: 5
     volumes:
       - ./keycloak/keycloak-realm.json:/opt/keycloak/data/import/keycloak-realm.json
-    command: start-dev --import-realm --db=dev-mem
+    command: start-dev --import-realm --db=dev-mem --health-enabled=true
+
+
+  healthcheck:
+    build:
+      context: ./healthcheck
+    depends_on:
+      - keycloak
 
 
   minio:
     build: ./minio
     depends_on:
-      keycloak:
-        condition: service_healthy
+      - healthcheck
     #container_name: minio
     restart: on-failure
     ports:
@@ -51,7 +57,6 @@ services:
       interval: 10s
       retries: 5
     command: server /data --console-address :9001
-
 
   createbuckets:
     image: minio/mc
