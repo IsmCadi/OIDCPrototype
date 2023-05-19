@@ -24,8 +24,9 @@ public class OIDCAuthorizationService {
     private static final String minioServerUrl = "http://localhost:9000";
     private static final String redirectURI = "http://localhost:9000/oidc/callback";
     private static final String scopes = "openid profile minio-authorization";
-    private static final String tokenEndpoint = "http://localhost:8080/auth/realms/cyberduckrealm/protocol/openid-connect/token";
-    private static final String authorizationEndpoint = "http://localhost:8080/auth/realms/cyberduckrealm/protocol/openid-connect/auth";
+    //private static final String tokenEndpoint = "http://localhost:8080/auth/realms/cyberduckrealm/protocol/openid-connect/token";
+    private static final String tokenEndpoint = "http://localhost:8080/realms/cyberduckrealm/protocol/openid-connect/token";
+    private static final String authorizationEndpoint = "http://localhost:8080/realms/cyberduckrealm/protocol/openid-connect/auth";
 
     // Sets up the HTTP transport and JSON factory
     private final HttpTransport httpTransport = new NetHttpTransport();

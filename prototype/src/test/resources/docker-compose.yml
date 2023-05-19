@@ -17,22 +17,20 @@ services:
       KC_HEALTH_ENABLED: true
       KC_METRICS_ENABLED: true
     healthcheck:
-      test: [ "CMD-SHELL", "curl --fail http://localhost:8080/health || exit 1" ]
+      test: "curl -f http://localhost:8080//health/ready || exit 1"
       interval: 10s
       retries: 5
-    #healthcheck:
-      #test: ["CMD-SHELL", "curl --fail http://host.docker.internal:8080/auth/ || exit 1"]
     volumes:
       - ./keycloak/keycloak-realm.json:/opt/keycloak/data/import/keycloak-realm.json
-    command: start-dev --import-realm --db=dev-mem --health-enabled=true
+    command: start-dev --import-realm --db=dev-mem
 
 
   minio:
     build: ./minio
-    #depends_on:
-      #keycloak:
-        #condition: service_healthy
-    container_name: minio
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    #container_name: minio
     restart: on-failure
     ports:
       - "9000:9000"
@@ -42,7 +40,7 @@ services:
     environment:
       MINIO_ROOT_USER: cyberduckAccessKey
       MINIO_ROOT_PASSWORD: cyberduckSecretKey
-      MINIO_IDENTITY_OPENID_CONFIG_URL: http://host.docker.internal:8080/auth/realms/cyberduckrealm/.well-known/openid-configuration
+      MINIO_IDENTITY_OPENID_CONFIG_URL: http://host.docker.internal:8080/realms/cyberduckrealm/.well-known/openid-configuration
       MINIO_IDENTITY_OPENID_CLIENT_ID: minio
       MINIO_IDENTITY_OPENID_CLIENT_SECRET: password
       MINIO_IDENTITY_OPENID_DISPLAY_NAME: SSO_Keycloak

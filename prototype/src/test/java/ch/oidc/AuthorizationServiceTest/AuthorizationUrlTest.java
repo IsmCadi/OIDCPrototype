@@ -68,7 +68,7 @@ public class AuthorizationUrlTest {
         OIDCAuthorizationService authorizationService = new OIDCAuthorizationService();
         String authorizationUrl = authorizationService.getAuthorizationUrl();
 
-        String authorizationEndpoint = "http://localhost:8080/auth/realms/cyberduckrealm/protocol/openid-connect/auth";
+        String authorizationEndpoint = "http://localhost:8080/realms/cyberduckrealm/protocol/openid-connect/auth";
         assertTrue(authorizationUrl.contains(authorizationEndpoint));
         System.out.println("Test GetAuthorizationUrlIncludesAuthorizationServerEndpoint passed");
     }
