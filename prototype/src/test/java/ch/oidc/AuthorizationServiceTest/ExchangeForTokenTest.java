@@ -22,4 +22,21 @@ public class ExchangeForTokenTest {
         assertNotNull(tokens.getAccessToken());
         assertNotNull(tokens.getRefreshToken());
     }
+
+    // exchangeAuthorizationCodeForTokens method ->
+    // testCorrectTokenEndpoint
+    // testBuildCorrectTokenRequest
+    // testRedirectURIMatchesServer
+    // testValidTokenReponse
+
+    // refresh method ->
+    // testClientVerificationValid
+    // testScopesAreCorrect
+    // testValidTokenResponse
+
+    // minioSts method ->
+    // testValidMinioServerUrl
+    // testValidMinioResponse
+    // testValidToken
+
 }
