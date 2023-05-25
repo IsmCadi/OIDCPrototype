@@ -2211,7 +2211,7 @@
     {
       "username": "rawuser",
       "enabled": true,
-      "email": "testi@test.com",
+      "email": "readandwrite@test.com",
       "attributes":
       {
         "policy":"readwrite"
@@ -2235,7 +2235,7 @@
     {
       "username": "rouser",
       "enabled": true,
-      "email": "testi@test.com",
+      "email": "readonly@test.com",
       "attributes":
       {
         "policy":"readonly"
