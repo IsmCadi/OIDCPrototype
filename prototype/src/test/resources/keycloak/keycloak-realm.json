@@ -2209,7 +2209,7 @@
   },
   "users": [
     {
-      "username": "testi",
+      "username": "rawuser",
       "enabled": true,
       "email": "testi@test.com",
       "attributes":
@@ -2219,7 +2219,31 @@
       "credentials": [
         {
           "type": "password",
-          "value": "test"
+          "value": "rawuser"
+        }
+      ],
+      "realmRoles": [
+        "user"
+      ],
+      "clientRoles": {
+        "account": [
+          "view-profile",
+          "manage-account"
+        ]
+      }
+    },
+    {
+      "username": "rouser",
+      "enabled": true,
+      "email": "testi@test.com",
+      "attributes":
+      {
+        "policy":"readonly"
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "rouser"
         }
       ],
       "realmRoles": [

@@ -1,8 +1,6 @@
 package ch.oidc;
 
 public class OAuthTokens {
-    public static final OAuthTokens EMPTY = new OAuthTokens(null, null, Long.MAX_VALUE);
-
     private final String accessToken;
     private final String refreshToken;
     private final Long expiryInMilliseconds;

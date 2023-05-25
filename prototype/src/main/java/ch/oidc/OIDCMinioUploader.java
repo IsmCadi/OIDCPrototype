@@ -14,7 +14,6 @@ public class OIDCMinioUploader {
     private static final String minioServerUrl = "http://localhost:9000";
 
     public static void uploadFile(String accessKey, String secretKey, String sessionToken) throws IOException, InvalidKeyException, MinioException, NoSuchAlgorithmException {
-        //AWSStaticCredentialsProvider credentialsProvider = new AWSStaticCredentialsProvider(accessKey, secretKey, sessionToken);
         StaticProvider staticProvider = new StaticProvider(accessKey, secretKey, sessionToken);
 
         MinioClient minioClient = new MinioClient.Builder()

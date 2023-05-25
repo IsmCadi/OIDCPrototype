@@ -9,6 +9,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.w3c.dom.Element;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -24,7 +25,6 @@ public class OIDCAuthorizationService {
     private static final String minioServerUrl = "http://localhost:9000";
     private static final String redirectURI = "http://localhost:9000/oidc/callback";
     private static final String scopes = "openid profile minio-authorization";
-    //private static final String tokenEndpoint = "http://localhost:8080/auth/realms/cyberduckrealm/protocol/openid-connect/token";
     private static final String tokenEndpoint = "http://localhost:8080/realms/cyberduckrealm/protocol/openid-connect/token";
     private static final String authorizationEndpoint = "http://localhost:8080/realms/cyberduckrealm/protocol/openid-connect/auth";
 
@@ -41,8 +41,11 @@ public class OIDCAuthorizationService {
                 clientID,
                 clientSecret,
                 Collections.singleton(scopes))
+                // Defines getting token without requiring user interaction
                 .setAccessType("offline")
+                // Forces authorization server prompt user for consent
                 .setApprovalPrompt("force")
+                // Defines where to initiate the auth
                 .setAuthorizationServerEncodedUrl(authorizationEndpoint)
                 .build();
         // Generates the authorization URL
@@ -64,23 +67,11 @@ public class OIDCAuthorizationService {
         return new OAuthTokens(response.getAccessToken(), response.getRefreshToken(), expiryInMilliseconds);
     }
 
-/*    public static void validateAccessToken(String accessToken) throws IOException {
-        HttpRequestFactory requestFactory = new NetHttpTransport().createRequestFactory();
-        GenericUrl url = new GenericUrl("http://localhost:9000/auth/realms/master/protocol/openid-connect/userinfo");
-        HttpRequest request = requestFactory.buildGetRequest(url);
-        request.getHeaders().setAuthorization("Bearer " + accessToken);
-        HttpResponse response = request.execute();
-        String userInfo = response.parseAsString();
-        System.out.println(userInfo);
-    }*/
-
     public static OAuthTokens refresh(String refreshToken) throws IOException {
         TokenResponse response = new RefreshTokenRequest(new NetHttpTransport(), jsonFactory,
                 new GenericUrl(tokenEndpoint), refreshToken)
                 .setClientAuthentication(new ClientParametersAuthentication(clientID, clientSecret))
                 .setScopes(Collections.singleton(scopes))
-//                .setGrantType("refresh_token")
-//                .setRefreshToken(refreshToken)
                 .execute();
 
         // extract tokens and save them in an OAuthTokens object.

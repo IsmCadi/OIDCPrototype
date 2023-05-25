@@ -24,14 +24,10 @@ public class Main {
         System.out.print("Enter the authorization code: ");
         String authorizationCode = scanner.nextLine();
         OAuthTokens tokens = OIDCAuthorizationService.exchangeAuthorizationCodeForTokens(authorizationCode);
-        //System.out.println("Thats the userinfo:");
-        //OIDCAuthorizationService.validateAccessToken(accessToken);
 
         STSSessionCredentials credentials = getSTStempCredentials(tokens);
 
-
         // Try to upload files into the cyberduck bucket
-
         System.out.println("\nType some chars to upload a file. No chars -> exit loop");
         while (scanner.hasNext()) {
             String input = scanner.nextLine();
@@ -46,7 +42,6 @@ public class Main {
                 e.printStackTrace();
             }
         }
-
     }
 
     private static STSSessionCredentials getSTStempCredentials(OAuthTokens creds) throws ParserConfigurationException, IOException, SAXException {
